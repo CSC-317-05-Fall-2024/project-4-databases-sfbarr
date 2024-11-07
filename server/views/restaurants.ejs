@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visit Kyoto</title>
+    <link rel="shortcut icon" href="images/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/scripts/restaurantCards.js"></script>
+
+</head>
+
+<body class = "restaurants">
+    
+    <div class="container">
+        <% restaurantData.forEach(restaurant => { %>
+            <div class="restaurant-card" data-id= "<%= restaurant.id %>">
+                <h2><%= restaurant.name %></h2>
+                <p>Phone: <%= restaurant.phone %></p>
+                <p>Address: <%= restaurant.address %></p>
+                <img src="<%= restaurant.photo %>">
+                <button class="delete-btn">X</button>
+            </div>
+        <% }); %>
+    </div>
+
+    <script src="/scripts/header.js"></script>
+    
+</body>
+</html>

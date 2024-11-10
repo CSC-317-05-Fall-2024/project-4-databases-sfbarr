@@ -31,7 +31,7 @@ const createTables = async () => {
              CREATE TABLE reviews (
                 id SERIAL PRIMARY KEY,
                 rating INTEGER NOT NULL,
-                content TEXT,
+                review TEXT,
                 restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE
             );   
             `;

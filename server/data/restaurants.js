@@ -1,100 +1,58 @@
-// Fill this in
-let restaurantData = [ 
-    {
-        "id" : 0,
-        "name": "Anzukko",
-        "phone": "(415) 555-5555",
-        "address": "2F Le Sixieme bldg., 422-1 Ebisu-cho, Nakagyo-ku",
-        "photo": "https://placehold.co/235x188?text=Restaurant+Image&font=Lora"
-    },
-    {
-        "id" : 1,
-        "name": "Nishiki Warai",
-        "phone": "(415) 555-5555",
-        "address": "499 Nakauoyacho, Nishikikoji Sagaru, Kyoto, 604-8055",
-        "photo": "https://placehold.co/235x188?text=Restaurant+Image&font=Lora"
-    },
-    {   
-        "id" : 2,
-        "name": "Giro Giro Hitoshina",
-        "phone": "(415) 555-5555",
-        "address": "420-7 Nanba-cho, Takoyakushi-sagaru, Kiyamachi-dori, Shimogyo-ku, Kyoto, 600-8015",
-        "photo": "https://placehold.co/235x188?text=Restaurant+Image&font=Lora"
-    },
-    {
-        "id" : 3,
-        "name": "Ippudo Ramen",
-        "phone": "(415) 555-5555",
-        "address": "580 Nakanocho, Nishikikoji-Sagaru, Teramachi-dori, Nakagyo-ku, Kyoto, 604-8042",
-        "photo": "https://placehold.co/235x188?text=Restaurant+Image&font=Lora"
-    },
-    {
-        "id" : 4,
-        "name": "Kamaiki",
-        "phone": "(415) 555-5555",
-        "address": "9-1 Imamikadocho, Nara, 630-8374",
-        "photo": "https://placehold.co/235x188?text=Restaurant+Image&font=Lora"
-    },
-    {
-        "id" : 5,
-        "name": "Edogawa Naramachi",
-        "phone": "(415) 555-5555",
-        "address": "15 Kunodocho, Nara, 630-8357",
-        "photo": "https://placehold.co/235x188?text=Restaurant+Image&font=Lora"
-    },
-    {
-        "id" : 6,
-        "name": "Tenryu-ji Shigetsu (Vegan)",
-        "phone": "(415) 555-5555",
-        "address": "68 Sagatenryuji Susukinobabacho, Ukyo-ku, Kyoto, 616-8385",
-        "photo": "https://placehold.co/235x188?text=Restaurant+Image&font=Lora"
-    },
-    {
-        "id" : 7,
-        "name": "Arashiyama Yoshimura",
-        "phone": "(415) 555-5555",
-        "address": "3-4 Sagatenryuji Tsukurimichicho, Ukyo-ku, Kyoto, 616-8384",
-        "photo": "https://placehold.co/235x188?text=Restaurant+Image&font=Lora"
-    },
-    {
-        "id" : 8,
-        "name": "Sumibi Yakiniku Tsunku",
-        "phone": "(415) 555-5555",
-        "address": "714 Ebisunocho Shimogyo-ku Ebisu Square Bldg. 1F, Kyoto 600-8310 Kyoto Prefecture",
-        "photo": "https://placehold.co/235x188?text=Restaurant+Image&font=Lora"
-    }
-];
-
-
-
-const getNextId = () => {
-    // We're using 0 as first ID, so length is already +1
-    return restaurantData.length;
-}
-
+import { pool } from '/Users/jameschristianbarr/CSC317/project-4-databases-sfbarr/server/config/database.js';
 // Get a list of restaurants
-const getRestaurants = () => {
-    console.log('getRestaurants() returns [] from restaurants.js');
-    return restaurantData;
+// STATUS: WORKING
+const getRestaurants = async () => {
+    try {
+        console.log('getRestaurants() is called from somewhere, makes query to pool, returns databse if it exists');
+        const result = await pool.query(`SELECT * FROM restaurants`);
+        
+        const restaurantData = result.rows;
+        console.log(restaurantData);
+        restaurantData.forEach(restaurant => {
+            console.log(restaurant.id, restaurant.name);  // Access the columns of each row
+          });
+        return restaurantData;
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 
 // Get a restaurant by id
-const getRestaurant = (id) => {
+// STATUS: WORKING v2 (fixed query syntax problem)
+const getRestaurant = async (id) => {
     
-    console.log("getRestaurant request");
-    var restaurant = restaurantData.find(restaurant => restaurant.id === id)
-    return restaurant; 
+    try {
+        const result = await pool.query(`SELECT * FROM restaurants WHERE id = $1`, [id]);
+        return result.rows[0];
+    } catch (error) {
+        console.log(error);
+    }
 };
 
-// Create a new restaurant entry
-const createRestaurant = (newRestaurant) => {
+const getReviewsForRestaurant = async (id) => {
+    try {
+        const result = await pool.query(`SELECT * FROM reviews WHERE restaurant_id = $1`, [id] );
+    } catch (error) {
+        console.log(error);
+    }
+} 
 
-    // concoct new restaurant w/ ID using existing form info!
-    const restaurantEntry = {
-        id: getNextId(),
-        ...newRestaurant // spread function/operator(?)
-    };
+// Create a new restaurant entry
+// STATUS: WORKING
+const createRestaurant = async (newRestaurant) => {
+
+    try {
+        const insertQuery = `
+                INSERT INTO restaurants (name, phone, address, photo)
+                VALUES ($1, $2, $3, $4);
+            `;
+            const values = [newRestaurant.name, newRestaurant.phone, newRestaurant.address, newRestaurant.photo];
+            await pool.query(insertQuery, values);
+
+    } catch (error) {
+        
+    }
     var oldLength = restaurantData.length;
     
     restaurantData.push(restaurantEntry); // push into restaurantData
@@ -102,20 +60,21 @@ const createRestaurant = (newRestaurant) => {
 };
 
 // Delete a restaurant by id
-
-const deleteRestaurant = (id) => {
-    const index = restaurantData.findIndex(restaurant => restaurant.id === id);
-    var len = restaurantData.length; 
-    if (index !== -1) {
-        restaurantData.splice(index, 1); // Remove the restaurant
-        if (restaurantData.length != len){
-            console.log(len);
-            console.log(restaurantData.length);
-            return true; // Tell callee deletion was successful
-        } 
-        
+// STATUS: WORKING
+const deleteRestaurant = async (id) => {
+    try {
+        const result = await pool.query(`
+            DELETE FROM restaurants WHERE id = $1`, [id]);
+            if (result.rowCount > 0) {
+                console.log(`Restaurant with id ${id} was successfully deleted.`);
+                return true;
+            } else {
+                console.log(`No restaurant found with id ${id}.`);
+                return false;
+            }
+    } catch (error){
+        console.log(error);
     }
-    return false; // Restaurant not found
 };
 
 

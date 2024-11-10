@@ -14,7 +14,9 @@ Goals for this assignment:
 
 ```
 # replace me!
-Start: 6:30 pm, Nov 6
+Start: 4 hrs Nov 6 
+       4 hrs Nov 7
+       1 hr Nov 8
 ```
 
 

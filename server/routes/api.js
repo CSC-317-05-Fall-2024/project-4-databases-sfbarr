@@ -9,28 +9,28 @@ const router = express.Router();
 // Add routes here
 
 
-router.get('/restaurants', (req, res) => {
+router.get('/restaurants', async (req, res) => {
     console.log("Router get request \n\n");
-    const restaurants = getRestaurants();
+    const restaurants = await getRestaurants();
     res.json(restaurants); // Respond with JSON
 });
 
 // Create a new restaurant
-router.post('/restaurants', (req, res) => {
+router.post('/restaurants', async (req, res) => {
     console.log("Router just got a POST request \n\n"); 
     const newRestaurant = req.body; 
-    const createdRestaurant = createRestaurant(newRestaurant);
+    const createdRestaurant = await createRestaurant(newRestaurant);
     res.status(201).json(createdRestaurant); // send newly created element as response
 });
 
 
 // Delete a restaurant by ID
 
-router.delete('/restaurants/:id', (req, res) => {
+router.delete('/restaurants/:id', async (req, res) => {
     console.log("API just received HTTP DELETE request \n\n");
     const id = parseInt(req.params.id, 10); // Extract ID from the URL and parse it
     console.log(`Received request to delete restaurant with ID: ${+id}`);
-    const deleted = deleteRestaurant(id); 
+    const deleted = await deleteRestaurant(id); 
 
     // Check if the restaurant was deleted
     if (deleted) {                          
